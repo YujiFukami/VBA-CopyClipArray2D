@@ -18,7 +18,7 @@ Option Explicit
 '------------------------------
 
 
-Sub ClipCopyArray2D(Array2D)
+Public Sub ClipCopyArray2D(Array2D)
 '2次元配列を変数宣言用のテキストデータに変換して、クリップボードにコピーする
 '20210805
     
