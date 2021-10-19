@@ -2,9 +2,9 @@ Attribute VB_Name = "ModClipCopyArray2D"
 Option Explicit
 
 'ClipCopyArray2D   ・・・元場所：FukamiAddins3.ModArray    
-'ClipboardCopy     ・・・元場所：FukamiAddins3.ModClipboard
 'CheckArray2D      ・・・元場所：FukamiAddins3.ModArray    
 'CheckArray2DStart1・・・元場所：FukamiAddins3.ModArray    
+'ClipboardCopy     ・・・元場所：FukamiAddins3.ModClipboard
 
 '------------------------------
 
@@ -21,17 +21,21 @@ Option Explicit
 Public Sub ClipCopyArray2D(Array2D)
 '2次元配列を変数宣言用のテキストデータに変換して、クリップボードにコピーする
 '20210805
-    
+'20211016 「"」を含む場合も対応
+
     '引数チェック
     Call CheckArray2D(Array2D, "Array2D")
     Call CheckArray2DStart1(Array2D, "Array2D")
     
-    Dim I&, J&, K&, M&, N& '数え上げ用(Long型)
+    Dim I As Long
+    Dim J As Long
+    Dim M As Long
+    Dim N As Long '数え上げ用(Long型)
     N = UBound(Array2D, 1)
     M = UBound(Array2D, 2)
     
     Dim TmpValue
-    Dim Output$
+    Dim Output As String
     
     Output = ""
     For I = 1 To N
@@ -43,7 +47,12 @@ Public Sub ClipCopyArray2D(Array2D)
         
         For J = 1 To M
             TmpValue = Array2D(I, J)
-            If IsNumeric(TmpValue) Then
+            
+            TmpValue = Replace(TmpValue, """", String(2, """")) '20211016
+            
+            If TmpValue = "" Then
+                Output = Output & """" & """"
+            ElseIf IsNumeric(TmpValue) Then
                 Output = Output & TmpValue
             Else
                 Output = Output & """" & TmpValue & """"
@@ -69,14 +78,45 @@ Public Sub ClipCopyArray2D(Array2D)
     
 End Sub
 
+Private Sub CheckArray2D(InputArray, Optional HairetuName As String = "配列")
+'入力配列が2次元配列かどうかチェックする
+'20210804
+
+    Dim Dummy2 As Integer
+    Dim Dummy3 As Integer
+    On Error Resume Next
+    Dummy2 = UBound(InputArray, 2)
+    Dummy3 = UBound(InputArray, 3)
+    On Error GoTo 0
+    If Dummy2 = 0 Or Dummy3 <> 0 Then
+        MsgBox (HairetuName & "は2次元配列を入力してください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
+Private Sub CheckArray2DStart1(InputArray, Optional HairetuName As String = "配列")
+'入力2次元配列の開始番号が1かどうかチェックする
+'20210804
+
+    If LBound(InputArray, 1) <> 1 Or LBound(InputArray, 2) <> 1 Then
+        MsgBox (HairetuName & "の開始要素番号は1にしてください")
+        Stop
+        Exit Sub '入力元のプロシージャを確認するために抜ける
+    End If
+
+End Sub
+
 Private Sub ClipboardCopy(ByVal InputClipText, Optional MessageIrunaraTrue As Boolean = False)
 '入力テキストをクリップボードに格納
 '配列ならば列方向をTabわけ、行方向を改行する。
 '20210719作成
     
     '入力した引数が配列か、配列の場合は1次元配列か、2次元配列か判定
-    Dim HairetuHantei%
-    Dim Jigen1%, Jigen2%
+    Dim HairetuHantei As Integer
+    Dim Jigen1        As Integer
+    Dim Jigen2        As Integer
     If IsArray(InputClipText) = False Then
         '入力引数が配列でない
         HairetuHantei = 0
@@ -93,8 +133,11 @@ Private Sub ClipboardCopy(ByVal InputClipText, Optional MessageIrunaraTrue As Bo
     End If
     
     'クリップボードに格納用のテキスト変数を作成
-    Dim Output$
-    Dim I%, J%, K%, M%, N% '数え上げ用(Integer型)
+    Dim Output As String
+    Dim I      As Integer
+    Dim J      As Integer
+    Dim M      As Integer
+    Dim N      As Integer
     
     If HairetuHantei = 0 Then '配列でない場合
         Output = InputClipText
@@ -158,35 +201,6 @@ Private Sub ClipboardCopy(ByVal InputClipText, Optional MessageIrunaraTrue As Bo
                 "をクリップボードにコピーしました。")
     End If
     
-End Sub
-
-Private Sub CheckArray2D(InputArray, Optional HairetuName$ = "配列")
-'入力配列が2次元配列かどうかチェックする
-'20210804
-
-    Dim Dummy2%, Dummy3%
-    On Error Resume Next
-    Dummy2 = UBound(InputArray, 2)
-    Dummy3 = UBound(InputArray, 3)
-    On Error GoTo 0
-    If Dummy2 = 0 Or Dummy3 <> 0 Then
-        MsgBox (HairetuName & "は2次元配列を入力してください")
-        Stop
-        Exit Sub '入力元のプロシージャを確認するために抜ける
-    End If
-
-End Sub
-
-Private Sub CheckArray2DStart1(InputArray, Optional HairetuName$ = "配列")
-'入力2次元配列の開始番号が1かどうかチェックする
-'20210804
-
-    If LBound(InputArray, 1) <> 1 Or LBound(InputArray, 2) <> 1 Then
-        MsgBox (HairetuName & "の開始要素番号は1にしてください")
-        Stop
-        Exit Sub '入力元のプロシージャを確認するために抜ける
-    End If
-
 End Sub
 
 
