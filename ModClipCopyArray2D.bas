@@ -6,16 +6,6 @@ Option Explicit
 'CheckArray2DStart1・・・元場所：FukamiAddins3.ModArray    
 'ClipboardCopy     ・・・元場所：FukamiAddins3.ModClipboard
 
-'------------------------------
-
-
-'配列の処理関係のプロシージャ
-
-'------------------------------
-
-
-
-'------------------------------
 
 
 Public Sub ClipCopyArray2D(Array2D)
